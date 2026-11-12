@@ -39,7 +39,7 @@ fi
 # --- 1. dependencies ----------------------------------------------------------
 if [[ "${SKIP_PIP:-0}" != "1" ]]; then
     echo "== Installing Python dependencies"
-    $PYTHON -m pip install --upgrade datasets tiktoken numpy tqdm requests transformers
+    $PYTHON -m pip install --upgrade datasets tiktoken numpy tqdm
 fi
 
 # --- 2. disk space check --------------------------------------------------------
@@ -71,8 +71,17 @@ else
 fi
 
 # --- 4. HellaSwag ---------------------------------------------------------------
-echo "== Downloading HellaSwag val set"
-$PYTHON -c "from hellaswag import download; download('val')"
+# (downloaded directly: importing hellaswag.py would require torch + transformers)
+HS_FILE="hellaswag/hellaswag_val.jsonl"
+HS_URL="https://raw.githubusercontent.com/rowanz/hellaswag/master/data/hellaswag_val.jsonl"
+if [[ -s "$HS_FILE" ]]; then
+    echo "== HellaSwag val set already present, skipping"
+else
+    echo "== Downloading HellaSwag val set"
+    mkdir -p hellaswag
+    $PYTHON -c "import sys, urllib.request; urllib.request.urlretrieve(sys.argv[1], sys.argv[2])" "$HS_URL" "$HS_FILE.tmp"
+    mv "$HS_FILE.tmp" "$HS_FILE"
+fi
 
 # --- 5. optional cleanup --------------------------------------------------------
 if [[ "${CLEAN_HF_CACHE:-0}" == "1" ]]; then
