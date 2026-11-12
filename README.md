@@ -28,7 +28,7 @@ For discussions and questions, please use [Discussions tab](https://github.com/k
 
 [![](https://dcbadge.vercel.app/api/server/3zy8kqD9Cp?compact=true&style=flat)](https://discord.gg/3zy8kqD9Cp)
 
-## Video
+## Reference Video
 
 [Let's reproduce GPT-2 (124M) YouTube lecture](https://youtu.be/l8pRSuU81PU)
 
