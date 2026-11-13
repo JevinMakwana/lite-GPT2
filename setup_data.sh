@@ -71,16 +71,13 @@ else
 fi
 
 # --- 4. HellaSwag ---------------------------------------------------------------
-# (downloaded directly: importing hellaswag.py would require torch + transformers)
+# (from the HuggingFace mirror; the original GitHub source is gone. No torch needed.)
 HS_FILE="hellaswag/hellaswag_val.jsonl"
-HS_URL="https://raw.githubusercontent.com/rowanz/hellaswag/master/data/hellaswag_val.jsonl"
 if [[ -s "$HS_FILE" ]]; then
     echo "== HellaSwag val set already present, skipping"
 else
     echo "== Downloading HellaSwag val set"
-    mkdir -p hellaswag
-    $PYTHON -c "import sys, urllib.request; urllib.request.urlretrieve(sys.argv[1], sys.argv[2])" "$HS_URL" "$HS_FILE.tmp"
-    mv "$HS_FILE.tmp" "$HS_FILE"
+    $PYTHON download_hellaswag.py val
 fi
 
 # --- 5. optional cleanup --------------------------------------------------------

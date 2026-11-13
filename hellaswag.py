@@ -63,12 +63,9 @@ enc = tiktoken.get_encoding("gpt2")
 
 def download(split):
     """Downloads HellaSwag DATA_CACHE_DIR"""
-    os.makedirs(DATA_CACHE_DIR, exist_ok=True)
-    data_url = hellaswags[split]
-    data_filename = os.path.join(DATA_CACHE_DIR, f"hellaswag_{split}.jsonl")
-    if not os.path.exists(data_filename):
-        print(f"Downloading {data_url} to {data_filename}...")
-        download_file(data_url, data_filename)
+    # the GitHub URLs above are dead (HTTP 451); fetch from the HuggingFace mirror instead
+    from download_hellaswag import download as hf_download
+    hf_download(split)
 
 def render_example(example):
     """

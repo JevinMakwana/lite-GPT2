@@ -50,9 +50,9 @@ HF_HOME=/path/to/big/disk/hf_cache CLEAN_HF_CACHE=1 bash setup_data.sh
 
 ### 2. HellaSwag (validation split): benchmark evaluation
 
-- **Source:** [rowanz/hellaswag](https://github.com/rowanz/hellaswag), 10,042 multiple-choice sentence-completion questions.
+- **Source:** [Rowan/hellaswag](https://huggingface.co/datasets/Rowan/hellaswag) on HuggingFace, 10,042 multiple-choice sentence-completion questions. (The original GitHub repo, rowanz/hellaswag, now returns HTTP 451, so `download_hellaswag.py` fetches the HuggingFace copy and converts it to jsonl with integer labels.)
 - **Purpose:** an evaluation only, never trained on. Every 250 steps the model picks the most likely of 4 endings per question, and the accuracy is logged to track how well the model understands common-sense text. Reference: OpenAI's GPT-2 124M scores ~29.5% with this script's method.
-- **Prepared by:** `hellaswag.py` (`download('val')`, called by `setup_data.sh`).
+- **Prepared by:** `download_hellaswag.py val` (called by `setup_data.sh`; `hellaswag.py` also uses it).
 - **Output:** `hellaswag/hellaswag_val.jsonl` (~11 MB).
 
 ## Disk space
