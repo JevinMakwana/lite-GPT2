@@ -322,7 +322,9 @@ if torch.cuda.is_available():
 enc = tiktoken.get_encoding("gpt2")
 
 total_batch_size = 524288 # 2**19, ~0.5M, in number of tokens
-B = 64 # micro batch size
+# micro batch size per GPU. 64 fits 80 GB GPUs; 16 is safe on 32 GB (e.g. RTX 5090).
+# Changing B does not change training: grad_accum_steps grows to keep total_batch_size fixed.
+B = int(os.environ.get("MICRO_BATCH", 16))
 T = 1024 # sequence length
 assert total_batch_size % (B * T * ddp_world_size) == 0, "make sure total_batch_size is divisible by B * T * ddp_world_size"
 grad_accum_steps = total_batch_size // (B * T * ddp_world_size)
@@ -350,6 +352,10 @@ max_lr = 6e-4
 min_lr = max_lr * 0.1
 warmup_steps = 715
 max_steps = 19073 # 19,073 steps is ~1 epoch, if data is 10B tokens and batch size 0.5M tokens
+# MAX_STEPS=50 stops the run early (smoke test) without changing the LR schedule above
+num_steps = int(os.environ.get("MAX_STEPS", max_steps))
+if master_process:
+    print(f"micro batch B={B}, running {num_steps} of {max_steps} scheduled steps")
 def get_lr(it):
     # 1) linear warmup for warmup_iters steps
     if it < warmup_steps:
@@ -373,9 +379,9 @@ log_file = os.path.join(log_dir, f"log.txt")
 with open(log_file, "w") as f: # open for writing to clear the file
     pass
 
-for step in range(max_steps):
+for step in range(num_steps):
     t0 = time.time()
-    last_step = (step == max_steps - 1)
+    last_step = (step == num_steps - 1)
 
     # once in a while evaluate our validation loss
     if step % 250 == 0 or last_step:
